@@ -1,0 +1,50 @@
+_target_: src.datamodules.musdb_datamodule.MusdbDataModule
+
+# data_dir is specified in config.yaml
+data_dir: null
+
+single_channel: False
+
+# chunk_size = (hop_length * (dim_t - 1) / sample_rate) secs
+sample_rate: 44100
+hop_length: ${model.hop_length}   # stft hop_length
+dim_t: ${model.dim_t}  # number of stft frames
+
+# number of overlapping wave samples between chunks when separating a whole track
+overlap: ${model.overlap}
+
+source_names:
+  - bass
+  - drums
+  - other
+  - vocals
+target_name: ${model.target_name}
+
+external_datasets: null
+#external_datasets:
+#  - test
+
+
+batch_size: 8
+num_workers: 0
+pin_memory: False
+
+aug_params:
+  - 2   # maximum pitch shift in semitones (-x < shift param < x)
+  - 20  # maximum time stretch percentage (-x < stretch param < x)
+
+validation_set:
+  - Actions - One Minute Smile
+  - Clara Berry And Wooldog - Waltz For My Victims
+  - Johnny Lokke - Promises & Lies
+  - Patrick Talbot - A Reason To Leave
+  - Triviul - Angelsaint
+#  - Alexander Ross - Goodbye Bolero
+#  - Fergessen - Nos Palpitants
+#  - Leaf - Summerghost
+#  - Skelpolu - Human Mistakes
+#  - Young Griffo - Pennies
+#  - ANiMAL - Rockshow
+#  - James May - On The Line
+#  - Meaxic - Take A Step
+#  - Traffic Experiment - Sirens

@@ -1,0 +1,17 @@
+name: mdx-net
+
+channels:
+  - pytorch
+  - nvidia
+  - anaconda
+
+dependencies:
+  - python<=3.9
+  - pip
+  - cudatoolkit
+  - pytorch=1.13.1
+  - torchaudio
+  - ffmpeg==4.3
+
+  - pip:
+      - -r requirements.txt

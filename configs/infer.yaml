@@ -1,0 +1,21 @@
+# @package _global_
+
+# specify here default training configuration
+defaults:
+  - model: vocals
+  - paths: default.yaml
+  # enable color logging
+  - override hydra/hydra_logging: colorlog
+  - override hydra/job_logging: colorlog
+
+#hydra:
+#  run:
+#    dir: ${get_eval_log_dir:${ckpt_path}}
+
+#ckpt_path: "G:\\Experiments\\KLRef\\vocals.onnx"
+ckpt_path:
+mixture_path:
+batch_size: 4
+device: 'cuda:0'
+
+double_chunk: False

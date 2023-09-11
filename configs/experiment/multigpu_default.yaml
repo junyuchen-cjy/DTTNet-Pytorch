@@ -1,0 +1,26 @@
+# @package _global_
+
+# to execute this experiment run:
+# python run.py experiment=example_simple.yaml
+
+defaults:
+  - override /callbacks: default
+  - override /logger:
+    - wandb
+    - tensorboard
+
+
+#callbacks:
+#  early_stopping:
+#    patience: 1000000
+
+#datamodule:
+#  external_datasets:
+#    - test
+
+trainer:
+  max_epochs: 1000000
+  accelerator: cuda
+  amp_backend: native
+  precision: 16
+  track_grad_norm: -1

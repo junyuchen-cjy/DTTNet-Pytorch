@@ -1,0 +1,38 @@
+# @package _global_
+
+# specify here default training configuration
+defaults:
+  - model: ConvTDFNet_vocals
+  - logger:
+    - wandb
+    - tensorboard
+  - paths: default.yaml
+  # enable color logging
+  - override hydra/hydra_logging: colorlog
+  - override hydra/job_logging: colorlog
+
+hydra:
+  run:
+    dir: ${get_eval_log_dir:${ckpt_path}}
+
+#ckpt_path: "G:\\Experiments\\KLRef\\vocals.onnx"
+ckpt_path: ${oc.env:ckpt_path}
+
+split: 'test'
+batch_size: 4
+device: 'cuda:0'
+bss: fast # fast or official
+single: False # for debug investigation, only run the model on 1 single song
+
+#data_dir: ${oc.env:data_dir}
+eval_dir: ${oc.env:eval_dir}
+wandb_api_key: ${oc.env:wandb_api_key}
+
+logger:
+  wandb:
+#    project: mdx_eval_${split}
+    project: new_eval_order
+    name: ${get_eval_log_dir:${ckpt_path}}
+
+pool_workers: 8
+double_chunk: False

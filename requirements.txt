@@ -1,0 +1,33 @@
+# --------- pytorch --------- #
+torch==1.13.1
+pytorch-lightning==1.9.0
+
+# --------- hydra --------- #
+hydra-core
+hydra-colorlog
+hydra-optuna-sweeper
+
+# --------- loggers --------- #
+wandb>=0.10.30
+tensorboard
+
+# --------- linters --------- #
+pre-commit
+black
+isort
+flake8
+
+# --------- others --------- #
+python-dotenv
+rich
+pytest
+sh
+scikit-learn
+pudb
+soundfile
+pyrootutils
+matplotlib
+seaborn
+onnxruntime-gpu
+librosa==0.9.1
+museval

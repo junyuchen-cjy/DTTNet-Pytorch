@@ -1,0 +1,28 @@
+_target_: src.dp_tdf.dp_tdf_net.DPTDFNet
+
+# abstract parent class
+target_name: 'vocals'
+lr: 0.0001
+optimizer: adamW
+
+dim_f: 2048
+dim_t: 256
+n_fft: 6144
+hop_length: 1024
+overlap: 3072
+
+audio_ch: 2
+
+block_type: TFC_TDF_Res2
+num_blocks: 5
+l: 3
+g: 32
+k: 3
+bn: 8
+bias: False
+bn_norm: BN
+bandsequence:
+  rnn_type: LSTM
+  bidirectional: True
+  num_layers: 4
+  n_heads: 2

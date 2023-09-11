@@ -1,0 +1,38 @@
+# @package _global_
+
+# to execute this experiment run:
+# python run.py experiment=example_simple.yaml
+
+defaults:
+  - multigpu_default
+  - override /model: other.yaml
+
+seed: 2021
+
+exp_name: other_g32
+
+# the name inside project
+logger:
+  wandb:
+    name: ${exp_name}
+
+model:
+  lr: 0.0002
+  optimizer: adamW
+  bn_norm: syncBN
+  audio_ch: 2 # datamodule.single_channel
+  g: 32
+
+trainer:
+  devices: 2 # int or list
+  sync_batchnorm: True
+  track_grad_norm: 2
+#  gradient_clip_val: 5
+
+datamodule:
+  batch_size: 8
+  num_workers: ${oc.decode:${oc.env:NUM_WORKERS}}
+  pin_memory: False
+  overlap: ${model.overlap}
+  audio_ch: ${model.audio_ch}
+  epoch_size:
