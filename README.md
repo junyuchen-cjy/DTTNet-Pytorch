@@ -40,7 +40,9 @@ conda activate DTT
 
 ## Inference
 
-1. Download checkpoints from: https://mega.nz/folder/E4c1QD7Z#OkgM_dEK1tC5MzpqEBuxvQ
+1. Download checkpoints from either:
+   - https://mega.nz/folder/E4c1QD7Z#OkgM_dEK1tC5MzpqEBuxvQ
+   - https://pan.baidu.com/s/1Tw6Fp6wYVZTqjRE-aDZdyw  (code：lgwe)
 2. Run code
 
 ```
