@@ -7,9 +7,9 @@ defaults:
   - multigpu_default
   - override /model: vocals.yaml
 
-seed: 2021
+seed: 42
 
-exp_name: vocals_g32
+exp_name: vc
 
 # the name inside project
 logger:
@@ -17,6 +17,7 @@ logger:
     name: ${exp_name}
 
 model:
+  ckpt_path: ${oc.env:pretrained_ckpt_path}
   lr: 0.0002
   optimizer: adamW
   bn_norm: syncBN
@@ -27,12 +28,17 @@ trainer:
   devices: 2 # int or list
   sync_batchnorm: True
   track_grad_norm: 2
+  max_epochs: 400
 #  gradient_clip_val: 5
 
 datamodule:
+  extended_dataset: ${oc.env:extended_dataset}
+  pos_lst: ["vocalchops_processed"]
+#  exclude_lst: ["vocalchops_processed"]
+  exclude_lst: []
   batch_size: 8
   num_workers: ${oc.decode:${oc.env:NUM_WORKERS}}
   pin_memory: False
   overlap: ${model.overlap}
   audio_ch: ${model.audio_ch}
-  epoch_size:
+  epoch_size: 324

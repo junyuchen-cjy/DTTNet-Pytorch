@@ -39,6 +39,9 @@ class MusdbDataModule(LightningDataModule):
             external_datasets,
             audio_ch: int,
             epoch_size,
+            extended_dataset,
+            pos_lst,
+            exclude_lst,
             **kwargs,
     ):
         super().__init__()
@@ -47,6 +50,9 @@ class MusdbDataModule(LightningDataModule):
         self.target_name = target_name
         self.aug_params = aug_params
         self.external_datasets = external_datasets
+        self.extended_dataset = extended_dataset
+        self.pos_lst = pos_lst
+        self.exclude_lst = exclude_lst
 
         self.batch_size = batch_size
         self.num_workers = num_workers
@@ -89,14 +95,18 @@ class MusdbDataModule(LightningDataModule):
                                             self.aug_params,
                                             self.external_datasets,
                                             self.single_channel,
-                                            self.epoch_size)
+                                            self.epoch_size,
+                                            self.extended_dataset,
+                                            self.pos_lst,
+                                            self.exclude_lst)
 
         self.data_val = MusdbValidDataset(self.data_dir,
                                           self.chunk_size,
                                           self.target_name,
                                           self.overlap,
                                           self.batch_size,
-                                          self.single_channel)
+                                          self.single_channel,
+                                          self.extended_dataset)
 
     def train_dataloader(self):
         return DataLoader(

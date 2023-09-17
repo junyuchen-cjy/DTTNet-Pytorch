@@ -5,11 +5,11 @@
 
 defaults:
   - multigpu_default
-  - override /model: bass.yaml
+  - override /model: vocals.yaml
 
-seed: 2021
+seed: 42
 
-exp_name: bass_g32
+exp_name: mdx_l2_bsrnn_h1
 
 # the name inside project
 logger:
@@ -17,20 +17,25 @@ logger:
     name: ${exp_name}
 
 model:
+  ckpt_path: ${oc.env:pretrained_ckpt_path}
   lr: 0.0002
   optimizer: adamW
-  bn_norm: syncBN
   audio_ch: 2 # datamodule.single_channel
   g: 32
 
+
 trainer:
-  devices: 2 # int or list
-  sync_batchnorm: True
-  track_grad_norm: 2
+  devices: 1
+  track_grad_norm: -1
 #  gradient_clip_val: 5
 
+
 datamodule:
-  batch_size: 8
+  extended_dataset: ${oc.env:extended_dataset}
+  pos_lst: ["vocalchops_processed"]
+#  exclude_lst: ["vocalchops_processed"]
+  exclude_lst: []
+  batch_size: 4
   num_workers: ${oc.decode:${oc.env:NUM_WORKERS}}
   pin_memory: False
   overlap: ${model.overlap}
