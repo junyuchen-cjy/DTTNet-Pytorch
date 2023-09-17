@@ -66,7 +66,7 @@ Params:
 
 ## Evaluation
 
-Change ```pool_workers``` in ```configs\evual_plus```. You can set the number as the number of cores in your CPU.
+Change ```pool_workers``` in ```configs\eval_plus```. You can set the number as the number of cores in your CPU.
 
 ```
 export ckpt_path=xxx # for Windows, replace the 'export' with 'set'
