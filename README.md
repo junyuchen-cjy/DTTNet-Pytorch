@@ -59,13 +59,15 @@ Parameter Options:
 
 ## Evaluation
 
+Change ```pool_workers``` in ```configs\eval```. You can set the number as the number of cores in your CPU.
+
 ```
 export ckpt_path=xxx # for Windows, replace the 'export' with 'set'
 
-python run_eval.py model=vocals eval_dir=G:/musdb18hq/ logger.wandb.name=xxxx
+python run_eval.py model=vocals logger.wandb.name=xxxx
 
 # or if you don't want to use logger
-python run_eval.py model=vocals eval_dir=G:/musdb18hq/ logger=[]
+python run_eval.py model=vocals logger=[]
 ```
 
 The result will be saved as eval.csv under the folder  ```LOG_DIR\basename(ckpt_path)_suffix```
@@ -119,6 +121,14 @@ python train.py experiment=vocals_dis datamodule=musdb_dev14 trainer=default
 # or if you don't want to use logger
 
 python train.py experiment=vocals_dis datamodule=musdb_dev14 trainer=default logger=[]
+```
+
+
+
+## Bespoke Fine-tune
+
+```
+git checkout bespoke
 ```
 
 

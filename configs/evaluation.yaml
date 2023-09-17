@@ -25,7 +25,7 @@ bss: fast # fast or official
 single: False # for debug investigation, only run the model on 1 single song
 
 #data_dir: ${oc.env:data_dir}
-eval_dir: ${oc.env:eval_dir}
+eval_dir: ${oc.env:data_dir}
 wandb_api_key: ${oc.env:wandb_api_key}
 
 logger:
