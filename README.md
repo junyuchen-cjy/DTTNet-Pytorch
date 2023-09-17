@@ -42,12 +42,10 @@ To fine-tune the model with the bespoke dataset. For vocals only.
 
 
 
-
-
 ## Train
 
 ```
-export extended_dataset=xxx
+export extended_dataset=xxx # target_root
 export pretrained_ckpt_path=xxx
 
 python train.py experiment=ft_vc datamodule=musdb_dev14 trainer=default
@@ -68,22 +66,23 @@ Params:
 
 ## Evaluation
 
+Change ```pool_workers``` in ```configs\evual_plus```. You can set the number as the number of cores in your CPU.
+
 ```
 export ckpt_path=xxx # for Windows, replace the 'export' with 'set'
+export eval_dir=xxxx # musdb18hq
+export extended_dataset=xxxx # target_root
 
-python run_eval.py model=vocals eval_dir=G:/musdb18hq/ logger.wandb.name=xxxx
+python run_eval_plus.py model=vocals logger=[]
 
 # or if you don't want to use logger
-python run_eval.py model=vocals eval_dir=G:/musdb18hq/ logger=[]
+
+python run_eval_plus.py model=vocals eval_dir=G:/musdb18hq/ logger=[]
 ```
 
+This will test the model on MUSDB18-HQ + 5 extra test sets + 1 fully combined test set.
+
 The result will be saved as eval.csv under the folder  ```LOG_DIR\basename(ckpt_path)_suffix```
-
-
-
-Parameter Options:
-
-- model=vocals, model=bass, model=drums, model=other
 
 
 
