@@ -99,7 +99,6 @@ Note that you will need:
 python demos/split_dataset.py # data partition
 ```
 
-
 ### 2. Data Augmentation (Optional)
 
 ```
@@ -113,7 +112,7 @@ mkdir /root/autodl-tmp/tmp
 python src/utils/data_augmentation.py --data_dir /root/autodl-tmp/musdb18hq/
 ```
 
-### 2. Run code
+### 3. Run code
 
 ```
 python train.py experiment=vocals_dis datamodule=musdb_dev14 trainer=default
@@ -121,6 +120,15 @@ python train.py experiment=vocals_dis datamodule=musdb_dev14 trainer=default
 # or if you don't want to use logger
 
 python train.py experiment=vocals_dis datamodule=musdb_dev14 trainer=default logger=[]
+```
+
+The 5 best models will be saved under ```LOG_DIR\dtt_vocals_suffix\checkpoints```
+
+### 4. Pick the best model
+
+```
+# edit api_key and path
+python src/utils/pick_best.py
 ```
 
 
