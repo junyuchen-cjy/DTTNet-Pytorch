@@ -82,8 +82,15 @@ Parameter Options:
 
 Note that you will need:
 
-- 1 TB disk space for data augmentation. Otherwise, delete values of the ```aug_params``` in ```configs/datamodule/musdb18_hq.yaml```. This will train the model without data augmentation.
-- 2 A40 (48GB). Or equivalently, 4 RTX 3090 (24 GB). Otherwise, change the ```datamodule.batch_size``` to a smaller one and ```trainer.devices``` to 1 in ```configs/experiment/vocals_dis.yaml```.
+- 1 TB disk space for data augmentation. 
+  - Otherwise, edit ```configs/datamodule/musdb18_hq.yaml``` so that:
+    - ```aug_params=[]```. This will train the model without data augmentation.
+- 2 A40 (48GB). Or equivalently, 4 RTX 3090 (24 GB). 
+  - Otherwise, edit  ```configs/experiment/vocals_dis.yaml``` so that：
+    -  ```datamodule.batch_size``` is smaller
+    -  ```trainer.devices:1``` 
+    - ```model.bn_norm: BN```
+    - delete```trainer.sync_batchnorm```
 
 ### 1. Data Partition 
 ```
