@@ -1,59 +1,68 @@
-# Dual-Path TFC-TDF UNet
+# DTT-Bespoke
 
-A Pytorch Implementation of the Dual-Path TFC-TDF UNet for Music Source Separation. DTTNet achieves 10.12 dB cSDR on vocals with 86% fewer parameters compared to BSRNN (SOTA). Our paper is coming soon.
+To fine-tune the model with the bespoke dataset. For vocals only.
 
 
 
-## Environment Setup (First Time)
+## Generate Bespoke Dataset
 
-1. Download MUSDB18HQ from https://sigsep.github.io/datasets/musdb.html
-2. (Optional) Edit the validation_set in configs/datamodule/musdb_dev14.yaml
-3. Create Miniconda/Anaconda environment
+1. Prepare a folder named 'samplepacks', with 5 subfolders:
+    ```
+    .
+    ├── guitar
+    ├── horn
+    ├── siren
+    ├── upfilters
+    └── vocalchops
+    ```
+
+    The subfolders should contain corresponding audio segments.
+
+
+
+2. generate bespoke-train, be-spoke-valid, bespoke-test
+
+   ```
+   # make the clips has length roughly between 4-8s
+   # This will create extra 5 folders with suffix 'processed'
+   python src/bespoke/merge_clips.py
+   
+   # sample the segments and generate bspoke train/val/test
+   python src/bespoke/generate_partitions.py
+   ```
+
+   Note that you will need to edit:
+
+   - ```samplepacks_root``` in ```merge_clip.py```
+   - ```musdb_root```, ```sample_pack_root``` , ```tmp_root``` and ```target_root```.
+     - ```musdb_root``` is essential since it provides length information for generating b-spoke val/test
+     - ```sample_pack_root``` stores all the processed segments
+     - ```tmp_root``` stores temp segments partitions, the partitions will be merged into synthetic songs.
+     - ```target_root``` will be the final dataset
+
+
+
+
+
+## Train
 
 ```
-conda env create -f conda_env_gpu.yaml -n DTT
-source /root/miniconda3/etc/profile.d/conda.sh
-conda activate DTT
-pip install -r requirements.txt
-export PYTHONPATH=$PYTHONPATH:$(pwd) # for Windows, replace the 'export' with 'set'
+export extended_dataset=xxx
+export pretrained_ckpt_path=xxx
+
+python train.py experiment=ft_vc datamodule=musdb_dev14 trainer=default
+
+# or if you don't want to use logger
+
+python train.py experiment=ft_vc datamodule=musdb_dev14 trainer=default logger=[]
 ```
 
-4. Edit .env file according to the instructions. It is recommended to use wandb to manage the logs.
+Params:
 
-```
-cp .env.example .env
-vim .env
-```
-
-
-
-## Environment Setup (After First Time)
-
-Once all these settings are configured, the next time you simply need to execute these code snippets to set up the environment
-
-```
-source /root/miniconda3/etc/profile.d/conda.sh
-conda activate DTT
-```
-
-
-
-## Inference
-
-1. Download checkpoints from: https://mega.nz/folder/E4c1QD7Z#OkgM_dEK1tC5MzpqEBuxvQ
-2. Run code
-
-```
-python run_infer.py model=vocals ckpt_path=xxxxx mixture_path=xxxx
-```
-
-The files will be saved under the folder ```PROJECT_ROOT\infer\```
-
-
-
-Parameter Options:
-
-- model=vocals, model=bass, model=drums, model=other
+- experiment
+  - ft_debug: single GPU, just to make sure that the code can run fluently
+  - ft_vc: the vocal chops are included in the training set
+  - ft_nvc: the vocal chops are not included in the training set
 
 
 
@@ -75,51 +84,6 @@ The result will be saved as eval.csv under the folder  ```LOG_DIR\basename(ckpt_
 Parameter Options:
 
 - model=vocals, model=bass, model=drums, model=other
-
-
-
-## Train
-
-Note that you will need:
-
-- 1 TB disk space for data augmentation. 
-  - Otherwise, edit ```configs/datamodule/musdb18_hq.yaml``` so that:
-    - ```aug_params=[]```. This will train the model without data augmentation.
-- 2 A40 (48GB). Or equivalently, 4 RTX 3090 (24 GB). 
-  - Otherwise, edit  ```configs/experiment/vocals_dis.yaml``` so that：
-    -  ```datamodule.batch_size``` is smaller
-    -  ```trainer.devices:1``` 
-    - ```model.bn_norm: BN```
-    - delete```trainer.sync_batchnorm```
-
-### 1. Data Partition 
-```
-python demos/split_dataset.py # data partition
-```
-
-
-### 2. Data Augmentation (Optional)
-
-```
-# install aug tools
-sudo apt-get update
-sudo apt-get install soundstretch
-
-mkdir /root/autodl-tmp/tmp
-
-# perform augumentation
-python src/utils/data_augmentation.py --data_dir /root/autodl-tmp/musdb18hq/
-```
-
-### 2. Run code
-
-```
-python train.py experiment=vocals_dis datamodule=musdb_dev14 trainer=default
-
-# or if you don't want to use logger
-
-python train.py experiment=vocals_dis datamodule=musdb_dev14 trainer=default logger=[]
-```
 
 
 
