@@ -70,7 +70,6 @@ Change ```pool_workers``` in ```configs\evual_plus```. You can set the number as
 
 ```
 export ckpt_path=xxx # for Windows, replace the 'export' with 'set'
-export eval_dir=xxxx # musdb18hq
 export extended_dataset=xxxx # target_root
 
 python run_eval_plus.py model=vocals logger=[]
