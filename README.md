@@ -8,7 +8,7 @@ A Pytorch Implementation of the Dual-Path TFC-TDF UNet for Music Source Separati
 
 1. Overlap-add is switched on by default, comment the **values** of key ```overlap_add``` in ```configs\infer``` and ```configs\evaluation``` to switch it off and the inference time will be 4x faster.
 
-![eval](./README.assets/eval.png)
+![eval](README.assets/eval.png)
 
 
 
