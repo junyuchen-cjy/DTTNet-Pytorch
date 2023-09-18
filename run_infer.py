@@ -3,12 +3,12 @@ import os
 import hydra
 from omegaconf import DictConfig, OmegaConf
 import soundfile as sf
-from src.evaluation.separate import separate_with_ckpt_TDF
 from src.utils.utils import load_wav, get_unique_save_path
 from src.utils.omega_resolvers import get_eval_log_dir
 from pathlib import Path
 
 import dotenv
+from src.evaluation.separate import separate_with_ckpt_TDF, no_overlap_inference, overlap_inference
 dotenv.load_dotenv(override=True)
 
 
@@ -29,7 +29,8 @@ def main(config: DictConfig):
     print(ckpt_path)
     mixture = load_wav(config.mixture_path)
     target_hat = separate_with_ckpt_TDF(config.batch_size, model, ckpt_path, mixture, config.device,
-                                        config.double_chunk)
+                                        config.double_chunk, config.overlap_add)
+
 
     base_name, file_name = os.path.split(config.mixture_path)
     #remove extension

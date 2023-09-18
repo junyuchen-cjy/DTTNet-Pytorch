@@ -7,12 +7,16 @@ import re
 import hydra
 import museval
 import numpy as np
-import soundfile as sf
 import wandb
 from omegaconf import DictConfig, OmegaConf
 from pytorch_lightning import Callback
 from pytorch_lightning.loggers import Logger
 import pytorch_lightning as pl
+import tempfile
+import soundfile as sf
+import shutil
+import subprocess
+
 
 from pytorch_lightning.utilities import rank_zero_only
 
@@ -384,6 +388,102 @@ def get_unique_save_path(dir_path):
         # get the number suffix
         ls = [int(f.split("_")[-1]) for f in ls]
         return max(ls) + 1
+
+# https://github.com/RetroCirce/Zero_Shot_Audio_Source_Separation/blob/main/utils.py
+def split_nparray_with_overlap(array, hop_length, overlap_size):
+    '''
+    Args:
+        array: np.array (t, c)
+        array_size: n_segs
+        overlap_size: int
+    Returns:
+        [(c, t_seg + overlap_size)]
+    '''
+    result = []
+    n, k, s = array.shape[0], hop_length + overlap_size, hop_length
+    p = s - (n - k) % s
+    array = np.pad(array, ((0, p), (0, 0)), 'constant', constant_values=0)
+    array_size = (n + p - k) // s + 1
+    # print(f"padded array size = {array.shape}")
+    # no_ovelap_size = int(len(array) / array_size)
+    for i in range(array_size):
+        offset = int(i * hop_length)
+        # last_loop = i == array_size
+        chunk = array[offset: offset + k]
+        # chunk = chunk.copy()
+        # if chunk.shape[0] < no_ovelap_size + overlap_size:
+        #     print(f"zero padding = {no_ovelap_size + overlap_size - chunk.shape[0]}")
+        #     chunk.resize((no_ovelap_size + overlap_size, 2), refcheck=False)
+        # chunk.resize((element_size + overlap_size, 2), refcheck=False)  # zero padding
+        result.append(chunk.T)
+    return result
+
+# https://github.com/RetroCirce/Zero_Shot_Audio_Source_Separation/blob/main/models/asp_model.py
+def join_chunks(tmp_root, chunk_ls, samplerate, overlap_size):
+    '''
+    Args:
+        chunk_ls: list of np.array (chunks, chunk_size, c)
+        overlap_size: int
+    '''
+    # tmp_root = "G:\\sdx2023fork\\tmp"
+
+    # song_dir = tmp_root
+    # src_filename = "test.wav"
+    # out_path = os.path.join(song_dir, src_filename)
+
+    array_size = len(chunk_ls)
+    tmpfolder = tempfile.TemporaryDirectory(dir=tmp_root)
+    tmpfolder_name = tmpfolder.name
+    tmpfolder.cleanup()
+
+    out_path = os.path.join(tmpfolder_name, "out.wav")
+
+    # print(tmpfolder_name)
+    os.mkdir(tmpfolder_name)
+
+
+    filters = []
+    args = ["ffmpeg", "-y", "-loglevel", "quiet"]
+    for i in range(array_size):
+        # tmpfile = tempfile.NamedTemporaryFile(dir=tmpfolder.name, suffix=".wav",delete=True)
+        # os.remove(tmpfile.name)
+        tmpfile_name = os.path.join(tmpfolder_name, f"chunk_{i}.wav")
+        args.extend(["-i", tmpfile_name])
+        sf.write(tmpfile_name, data=chunk_ls[i], samplerate=samplerate, format='WAV')
+
+        if i < array_size - 1:
+            filter_cmd = "[" + ("a" if i != 0 else "") + "{0}][{1}]acrossfade=ns={2}:c1=tri:c2=tri".format(i, i + 1,
+                                                                                                           overlap_size)
+
+            if i != array_size - 2:
+                filter_cmd += "[a{0}];".format(i + 1)
+
+            filters.append(filter_cmd)
+
+    args.extend([
+        "-filter_complex",
+        "".join(filters),
+        "-y",
+        out_path
+    ])
+
+    # print(" ".join(args))
+
+    try:
+        out = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE) # shell=False, otherwise cmd length exceed
+        # print(out)
+        # print(out.stderr.decode("gbk"))
+    except:
+        raise Exception("ffmpeg does not exist. Install ffmpeg or set config.overlap_rate to zero.")
+
+
+
+    # remove zero padding
+    test, sr = sf.read(out_path)
+    # print(f"test.shape = {test.shape}")
+    # os.remove(out_path)
+    shutil.rmtree(tmpfolder_name)
+    return test
 
 
 @rank_zero_only

@@ -4,7 +4,9 @@ from pathlib import Path
 import torch
 import numpy as np
 import onnxruntime as ort
-
+import math
+import os
+from src.utils.utils import split_nparray_with_overlap, join_chunks
 
 def separate_with_onnx(batch_size, model, onnx_path: Path, mix):
     n_sample = mix.shape[1]
@@ -103,7 +105,7 @@ def separate_with_onnx_TDF(batch_size, model, onnx_path: Path, mix):
 
 
 
-def separate_with_ckpt_TDF(batch_size, model, ckpt_path: Path, mix, device, double_chunk):
+def separate_with_ckpt_TDF(batch_size, model, ckpt_path: Path, mix, device, double_chunk, overlap_add):
     '''
     Args:
         batch_size: the inference batch size
@@ -124,9 +126,12 @@ def separate_with_ckpt_TDF(batch_size, model, ckpt_path: Path, mix, device, doub
     else:
         inf_ck = model.chunk_size
 
-
-    target_wav_hat = no_overlap_inference(model, mix, device, batch_size, inf_ck)
-
+    if overlap_add is None:
+        target_wav_hat = no_overlap_inference(model, mix, device, batch_size, inf_ck)
+    else:
+        if not os.path.exists(overlap_add.tmp_root):
+            os.makedirs(overlap_add.tmp_root)
+        target_wav_hat = overlap_inference(model, mix, device, batch_size, inf_ck, overlap_add.overlap_rate, overlap_add.tmp_root, overlap_add.samplerate)
 
     return target_wav_hat
 
@@ -158,3 +163,31 @@ def no_overlap_inference(model, mix, device, batch_size, inf_ck):
         target_wav_hat = np.concatenate(target_wav_hat, axis=-1)[:, :mix.shape[-1]]
     return target_wav_hat
 
+
+def overlap_inference(model, mix, device, batch_size, inf_ck, overlap_rate, tmp_root, samplerate):
+    '''
+    Args:
+        mix: (c, t)
+    '''
+    hop_length = math.ceil((1 - overlap_rate) * inf_ck)
+    overlap_size = inf_ck - hop_length
+    step_t = mix.shape[1]
+    mix_waves_batched = split_nparray_with_overlap(mix.T, hop_length, overlap_size)
+
+    mix_waves_batched = torch.tensor(mix_waves_batched, dtype=torch.float32).split(batch_size) # [(b, c, t)]
+
+    target_wav_hats = []
+
+    with torch.no_grad():
+        model.eval()
+        for mixture_wav in mix_waves_batched:
+            mix_spec = model.stft(mixture_wav.to(device))
+            spec_hat = model(mix_spec)
+            target_wav_hat = model.istft(spec_hat)
+            target_wav_hat = target_wav_hat.cpu().detach().numpy()
+            target_wav_hats.append(target_wav_hat) # (b, c, t)
+
+        target_wav_hat = np.vstack(target_wav_hats) # (sum(b), c, t)
+        target_wav_hat = np.transpose(target_wav_hat, (0, 2, 1)) # (sum(b), t, c)
+        target_wav_hat = join_chunks(tmp_root, target_wav_hat, samplerate, overlap_size) # (t, c)
+    return target_wav_hat[:step_t].T # (c, t)

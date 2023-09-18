@@ -42,14 +42,14 @@ conda activate DTT
 
 1. Download checkpoints from either:
    - https://mega.nz/folder/E4c1QD7Z#OkgM_dEK1tC5MzpqEBuxvQ
-   - https://pan.baidu.com/s/1Tw6Fp6wYVZTqjRE-aDZdyw  (code：lgwe)
+   - https://pan.baidu.com/s/1Tw6Fp6wYVZTqjRE-aDZdyw  (code: lgwe)
 2. Run code
 
 ```
 python run_infer.py model=vocals ckpt_path=xxxxx mixture_path=xxxx
 ```
 
-The files will be saved under the folder ```PROJECT_ROOT\infer\```
+The files will be saved under the folder ```PROJECT_ROOT\infer\songname_suffix\```
 
 
 
@@ -61,7 +61,7 @@ Parameter Options:
 
 ## Evaluation
 
-Change ```pool_workers``` in ```configs\eval```. You can set the number as the number of cores in your CPU.
+Change ```pool_workers``` in ```configs\evaluation```. You can set the number as the number of cores in your CPU. Overlap-add is switched on by default, comment the values of key ```overlap_add``` to switch off and it will be faster.
 
 ```
 export ckpt_path=xxx # for Windows, replace the 'export' with 'set'
@@ -79,6 +79,8 @@ The result will be saved as eval.csv under the folder  ```LOG_DIR\basename(ckpt_
 Parameter Options:
 
 - model=vocals, model=bass, model=drums, model=other
+
+
 
 
 
@@ -154,6 +156,8 @@ git checkout bespoke
    1. https://github.com/amanteur/BandSplitRNN-Pytorch
 3. fast-reid (Sync BN)
    1. https://github.com/JDAI-CV/fast-reid
+4. Zero_Shot_Audio_Source_Separation (overlap-add)
+   1. https://github.com/RetroCirce/Zero_Shot_Audio_Source_Separation
 
 
 

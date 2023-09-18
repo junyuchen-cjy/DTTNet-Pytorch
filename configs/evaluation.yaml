@@ -36,3 +36,8 @@ logger:
 
 pool_workers: 8
 double_chunk: False
+
+overlap_add:
+  overlap_rate: 0.5
+  tmp_root: ${paths.root_dir}/tmp # for saving temp chunks, since we use ffmpeg and will need io to disk
+  samplerate: 44100

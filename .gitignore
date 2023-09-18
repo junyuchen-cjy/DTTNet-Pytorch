@@ -9,6 +9,7 @@ __pycache__/
 .env
 
 predictions/
+tmp/
 
 # Distribution / packaging
 .Python

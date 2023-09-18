@@ -78,7 +78,7 @@ def evaluation(config: DictConfig):
                 if is_onnx:
                     target_hat = separate_with_onnx_TDF(config.batch_size, model, ckpt_path, mixture)
                 else:
-                    target_hat = separate_with_ckpt_TDF(config.batch_size, model, ckpt_path, mixture, config.device, config.double_chunk)
+                    target_hat = separate_with_ckpt_TDF(config.batch_size, model, ckpt_path, mixture, config.device, config.double_chunk, config.overlap_add)
 
 
                 pendings.append((folder_name, pool.submit(
