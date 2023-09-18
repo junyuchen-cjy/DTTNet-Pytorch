@@ -4,6 +4,16 @@ A Pytorch Implementation of the Dual-Path TFC-TDF UNet for Music Source Separati
 
 
 
+## Notes
+
+1. Overlap-add is switched on by default, comment the **values** of key ```overlap_add``` in ```configs\infer``` and ```configs\evaluation``` to switch it off and the inference time will be 4x faster.
+
+![eval](README.assets/eval.png)
+
+
+
+
+
 ## Environment Setup (First Time)
 
 1. Download MUSDB18HQ from https://sigsep.github.io/datasets/musdb.html
@@ -61,7 +71,7 @@ Parameter Options:
 
 ## Evaluation
 
-Change ```pool_workers``` in ```configs\evaluation```. You can set the number as the number of cores in your CPU. Overlap-add is switched on by default, comment the values of key ```overlap_add``` to switch off and it will be faster.
+Change ```pool_workers``` in ```configs\evaluation```. You can set the number as the number of cores in your CPU.
 
 ```
 export ckpt_path=xxx # for Windows, replace the 'export' with 'set'
