@@ -1,6 +1,6 @@
 # Dual-Path TFC-TDF UNet
 
-A Pytorch Implementation of the Dual-Path TFC-TDF UNet for Music Source Separation. DTTNet achieves 10.12 dB cSDR on vocals with 86% fewer parameters compared to BSRNN (SOTA). Our paper is coming soon.
+A Pytorch Implementation of the Dual-Path TFC-TDF UNet for Music Source Separation. DTTNet achieves 10.12 dB cSDR on vocals with 86% fewer parameters compared to BSRNN (SOTA). Our paper: https://arxiv.org/abs/2309.08684.
 
 
 
@@ -171,6 +171,17 @@ git checkout bespoke
 
 
 
+## Cite
 
+```
+@misc{chen2023music,
+      title={Music Source Separation Based on a Lightweight Deep Learning Framework (DTTNET: DUAL-PATH TFC-TDF UNET)}, 
+      author={Junyu Chen and Susmitha Vekkot and Pancham Shukla},
+      year={2023},
+      eprint={2309.08684},
+      archivePrefix={arXiv},
+      primaryClass={eess.AS}
+}
+```
 
 
